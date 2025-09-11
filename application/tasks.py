@@ -1,4 +1,6 @@
+import logging
 import uuid
+from datetime import datetime, timedelta, timezone
 from typing import Union
 
 from sqlmodel import Session, select
@@ -6,6 +8,8 @@ from sqlmodel import Session, select
 from domains.entities import TaskEntity
 from domains.models import TaskModel
 from ports.task_port import TaskPort
+
+logger = logging.getLogger("TaskLogger")
 
 
 class Task(TaskPort):
@@ -27,12 +31,15 @@ class Task(TaskPort):
         existing_task = session.exec(select(TaskModel).where(TaskModel.id == uuid.UUID(str(id)))).first()
         if not existing_task:
             return None
+        was_completed = getattr(existing_task, "completed", False)
         for key, value in task.__dict__.items():
             if value is not None:
                 setattr(existing_task, key, value)
         session.add(existing_task)
         session.commit()
         session.refresh(existing_task)
+        if not was_completed and getattr(existing_task, "completed", False):
+            logger.info(f"Task {existing_task.id} marked as completed.")
         return existing_task
 
     def remove_task(self, id: str, session: Session) -> bool:
@@ -46,3 +53,16 @@ class Task(TaskPort):
     def get_task(self, id: str, session: Session) -> Union[TaskModel, None]:
         task = session.exec(select(TaskModel).where(TaskModel.id == uuid.UUID(str(id)))).first()
         return task
+
+    def check_deadlines(self, session: Session, due: int) -> list[TaskModel]:
+        now = datetime.now(timezone.utc)
+        upcoming = now + timedelta(hours=due)
+        tasks = session.exec(
+            select(TaskModel).where(
+                TaskModel.deadline is not None,
+                not TaskModel.completed,
+                TaskModel.deadline <= upcoming,
+                TaskModel.deadline >= now,
+            )
+        ).all()
+        return list(tasks)

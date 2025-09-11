@@ -7,9 +7,17 @@ services:
     container_name: task_management_tool
     ports:
       - "8000:8000"
-    command: fastapi run main.py  
+    command: python3 main.py
     # future upgrades should utilize propper server
     # environment:
     #   - DATABASE_URL=sqlite:///./database.db
     #command: uvicorn adapters.api.main:app --host
     
+    # development only
+    volumes:
+      - ./adapters:/app/adapters
+      - ./application:/app/application
+      - ./domain:/app/domain
+      - ./infrastructure:/app/infrastructure
+      - ./ports:/app/ports
+      - ./main.py:/app/main.py

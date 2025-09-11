@@ -1,3 +1,4 @@
+import logging
 from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -12,13 +13,13 @@ router = APIRouter(prefix="/tasks")
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
-@router.get("/tasks/")
+@router.get("/")
 def list_tasks(session: SessionDep) -> list[TaskModel]:
     tasks = Task().list_tasks(session=session)
     return tasks
 
 
-@router.post("/tasks/")
+@router.post("/")
 def create_task(task: TaskEntity, session: SessionDep) -> Optional[TaskModel]:
     new_task = Task().create_task(task, session)
     if not new_task:
@@ -26,15 +27,16 @@ def create_task(task: TaskEntity, session: SessionDep) -> Optional[TaskModel]:
     return new_task
 
 
-@router.put("/tasks/{id}")
+@router.put("/{id}")
 def update_task(id: str, task: TaskEntity, session: SessionDep) -> TaskModel:
     updated_task = Task().update_task(id, task, session)
+
     if not updated_task:
         raise HTTPException(status_code=404, detail="Task not found")
     return updated_task
 
 
-@router.delete("/tasks/{id}", status_code=204)
+@router.delete("/{id}", status_code=204)
 def delete_task(id: str, session: SessionDep) -> None:
     status = Task().remove_task(id, session)
     if not status:
@@ -42,9 +44,12 @@ def delete_task(id: str, session: SessionDep) -> None:
     return
 
 
-@router.get("/tasks/{id}")
+@router.get("/{id}")
 def get_task(id: str, session: SessionDep) -> TaskModel:
     task = Task().get_task(id, session)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     return task
+
+
+# TODO patch missing

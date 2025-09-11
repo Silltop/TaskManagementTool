@@ -14,9 +14,6 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 
 class Project(ProjectPort):
-    def __init__(self):
-        pass
-
     def get_project(self, id: str, session: SessionDep) -> ProjectModel | None:
         project = session.exec(select(ProjectModel)).all()
         for proj in project:

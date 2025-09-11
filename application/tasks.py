@@ -9,9 +9,6 @@ from ports.task_port import TaskPort
 
 
 class Task(TaskPort):
-    def __init__(self):
-        pass
-
     def list_tasks(self, session) -> list[TaskModel]:
         tasks = session.exec(select(TaskModel)).all()
         return tasks

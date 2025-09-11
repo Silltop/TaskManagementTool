@@ -3,19 +3,12 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from adapters.db_connector import engine
+from adapters.db_connector import get_session
 from application.tasks import Task
 from domains.entities import TaskEntity
 from domains.models import TaskModel
 
 router = APIRouter(prefix="/tasks")
-
-
-def get_session():
-    with Session(engine) as session:
-        yield session
-
-
 SessionDep = Annotated[Session, Depends(get_session)]
 
 

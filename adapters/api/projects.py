@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 
-from adapters.api.tasks import get_session
+from adapters.db_connector import get_session
 from application.project import Project
 from domains.entities import ProjectEntity
 from domains.models import ProjectModel
@@ -42,33 +42,3 @@ def delete_project(id: str, session: SessionDep) -> None:
     if not status:
         raise HTTPException(status_code=404, detail="Project not found")
     return
-
-
-# @router.post("/{project_id}/tasks/{task_id}/link", status_code=status.HTTP_200_OK)
-# def link_task_to_project(project_id: int, task_id: int):
-#     if project_id not in projects:
-#         raise HTTPException(status_code=404, detail="Project not found")
-#     if task_id not in tasks:
-#         raise HTTPException(status_code=404, detail="Task not found")
-#     if task_id not in project_tasks.get(project_id, []):
-#         project_tasks[project_id].append(task_id)
-#     return {"message": "Task linked to project"}
-
-
-# @router.delete("/{project_id}/tasks/{task_id}/unlink", status_code=status.HTTP_200_OK)
-# def unlink_task_from_project(project_id: int, task_id: int):
-#     if project_id not in projects:
-#         raise HTTPException(status_code=404, detail="Project not found")
-#     if task_id not in tasks:
-#         raise HTTPException(status_code=404, detail="Task not found")
-#     if task_id in project_tasks.get(project_id, []):
-#         project_tasks[project_id].remove(task_id)
-#     return {"message": "Task unlinked from project"}
-
-
-# @router.get("/{id}/tasks", response_model=list[Task])
-# def get_project_tasks(id: int):
-#     if id not in projects:
-#         raise HTTPException(status_code=404, detail="Project not found")
-#     task_ids = project_tasks.get(id, [])
-#     return [tasks[tid] for tid in task_ids if tid in tasks]

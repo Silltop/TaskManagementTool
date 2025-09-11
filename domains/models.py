@@ -11,7 +11,7 @@ class TaskModel(SQLModel, table=True):
     description: Optional[str] = None
     deadline: datetime
     completed: bool = Field(default=False)
-    project_id: Optional[int] = Field(default=None, foreign_key="projectmodel.id")
+    project_id: Optional[UUID] = Field(default=None, foreign_key="projectmodel.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 

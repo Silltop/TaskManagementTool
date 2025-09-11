@@ -1,4 +1,4 @@
-from sqlmodel import create_engine
+from sqlmodel import Session, SQLModel, create_engine
 
 
 class DBConnector:
@@ -16,3 +16,12 @@ class DBConnector:
 
 db_connector = DBConnector()
 engine = db_connector.get_engine()
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session

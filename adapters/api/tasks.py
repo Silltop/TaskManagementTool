@@ -1,8 +1,12 @@
+from typing import Annotated, Optional
+
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session, select
+from sqlmodel import Session
 
 from adapters.db_connector import engine
-from domains.models import Task
+from application.tasks import Task
+from domains.entities import TaskEntity
+from domains.models import TaskModel
 
 router = APIRouter(prefix="/tasks")
 
@@ -12,46 +16,42 @@ def get_session():
         yield session
 
 
-@router.post("/tasks/", response_model=Task)
-def create_task(task: Task, session: Session = Depends(get_session)):
-    session.add(task)
-    session.commit()
-    session.refresh(task)
-    return task
+SessionDep = Annotated[Session, Depends(get_session)]
 
 
-@router.get("/tasks/", response_model=list[Task])
-def read_tasks(session: Session = Depends(get_session)):
-    tasks = session.exec(select(Task)).all()
+@router.get("/tasks/")
+def list_tasks(session: SessionDep) -> list[TaskModel]:
+    tasks = Task().list_tasks(session=session)
     return tasks
 
 
-@router.get("/tasks/{task_id}", response_model=Task)
-def read_task(task_id: str, session: Session = Depends(get_session)):
-    task = session.get(Task, task_id)
+@router.post("/tasks/")
+def create_task(task: TaskEntity, session: SessionDep) -> Optional[TaskModel]:
+    new_task = Task().create_task(task, session)
+    if not new_task:
+        raise HTTPException(status_code=409, detail="Task with this ID already exists")
+    return new_task
+
+
+@router.put("/tasks/{id}")
+def update_task(id: str, task: TaskEntity, session: SessionDep) -> TaskModel:
+    updated_task = Task().update_task(id, task, session)
+    if not updated_task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return updated_task
+
+
+@router.delete("/tasks/{id}", status_code=204)
+def delete_task(id: str, session: SessionDep) -> None:
+    status = Task().remove_task(id, session)
+    if not status:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return
+
+
+@router.get("/tasks/{id}")
+def get_task(id: str, session: SessionDep) -> TaskModel:
+    task = Task().get_task(id, session)
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
-    return task
-
-
-@router.put("/tasks/{task_id}", response_model=Task)
-def update_task(task_id: str, updated_task: Task, session: Session = Depends(get_session)):
-    db_task = session.get(Task, task_id)
-    if not db_task:
-        raise HTTPException(status_code=404, detail="Task not found")
-    for key, value in updated_task.dict(exclude_unset=True).items():
-        setattr(db_task, key, value)
-    session.add(db_task)
-    session.commit()
-    session.refresh(db_task)
-    return db_task
-
-
-@router.delete("/tasks/{task_id}", response_model=Task)
-def delete_task(task_id: str, session: Session = Depends(get_session)):
-    task = session.get(Task, task_id)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-    session.delete(task)
-    session.commit()
     return task

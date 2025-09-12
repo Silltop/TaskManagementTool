@@ -5,7 +5,16 @@ BASE_URL = "/tasks"
 
 @pytest.fixture
 def sample_task():
-    return {"id": "task_123", "title": "Test Task", "description": "A task for testing"}
+    return {
+        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "title": "string",
+        "description": "string",
+        "deadline": "2025-09-12T19:23:10.513Z",
+        "completed": False,
+        "project_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "created_at": "2025-09-12T19:23:10.513Z",
+        "updated_at": "2025-09-12T19:23:10.513Z",
+    }
 
 
 def test_create_task(client, sample_task):
@@ -42,7 +51,7 @@ def test_get_task(client, sample_task):
 
 
 def test_get_task_not_found(client):
-    response = client.get(BASE_URL + "/nonexistent")
+    response = client.get(BASE_URL + "/3Da85f64-5717-4562-b3fc-2c963f66afa6")
     assert response.status_code == 404
     assert response.json()["detail"] == "Task not found"
 
@@ -57,7 +66,7 @@ def test_update_task(client, sample_task):
 
 
 def test_update_task_not_found(client, sample_task):
-    response = client.put(BASE_URL + "/nonexistent", json=sample_task)
+    response = client.put(BASE_URL + "/3Da85f64-5717-4562-b3fc-2c963f66afa6", json=sample_task)
     assert response.status_code == 404
     assert response.json()["detail"] == "Task not found"
 
@@ -73,6 +82,6 @@ def test_delete_task(client, sample_task):
 
 
 def test_delete_task_not_found(client):
-    response = client.delete(BASE_URL + "/nonexistent")
+    response = client.delete(BASE_URL + "/3fa85f22-5717-4562-b3fc-2c963f66afa6")
     assert response.status_code == 404
     assert response.json()["detail"] == "Task not found"

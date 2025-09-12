@@ -15,7 +15,7 @@ logger = logging.getLogger("TaskLogger")
 class TaskService(TaskPort):
     def list_tasks(self, session) -> list[TaskModel]:
         tasks = session.exec(select(TaskModel)).all()
-        return tasks
+        return list(tasks)
 
     def create_task(self, task: TaskEntity, session: Session) -> Union[TaskModel, None]:
         existing_task = session.exec(select(TaskModel).where(TaskModel.id == task.id)).first()

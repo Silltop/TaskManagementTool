@@ -1,12 +1,9 @@
-import logging
-import uuid
 from dataclasses import dataclass
 from datetime import datetime
-from math import log
 from typing import Optional, Union
 from uuid import UUID
 
-from fastapi import HTTPException
+from infrastructure.utils.converters import convert_str_to_uuid
 
 
 @dataclass
@@ -16,17 +13,15 @@ class TaskEntity:
     description: Optional[str]
     deadline: datetime
     completed: bool
-    project_id: Optional[int]
+    project_id: Optional[Union[UUID, str]]
     created_at: Union[datetime, str]
     updated_at: Union[datetime, str]
 
     def __post_init__(self):
         if isinstance(self.id, str):
-            try:
-                self.id = uuid.UUID(self.id)
-            except ValueError as e:
-                logging.warning(f"Invalid UUID string provided: {self.id}")
-                raise HTTPException(status_code=400, detail="Invalid UUID format") from e
+            self.id = convert_str_to_uuid(self.id)
+        if self.project_id and isinstance(self.project_id, str):
+            self.project_id = convert_str_to_uuid(self.project_id)
         # additional checks required to handle different types of date
         if isinstance(self.created_at, str):
             self.created_at = datetime.fromisoformat(str(self.created_at).replace("Z", "+00:00"))
@@ -48,11 +43,7 @@ class ProjectEntity:
 
     def __post_init__(self):
         if isinstance(self.id, str):
-            try:
-                self.id = uuid.UUID(self.id)
-            except ValueError as e:
-                logging.warning(f"Invalid UUID string provided: {self.id}")
-                raise HTTPException(status_code=400, detail="Invalid UUID format") from e
+            self.id = convert_str_to_uuid(self.id)
         if isinstance(self.created_at, str):
             self.created_at = datetime.fromisoformat(str(self.created_at).replace("Z", "+00:00"))
         if isinstance(self.updated_at, str):

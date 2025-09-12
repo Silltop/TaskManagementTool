@@ -1,0 +1,2 @@
+class ConversionUUIDError(ValueError):
+    pass

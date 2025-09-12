@@ -6,3 +6,5 @@ database.db
 README.md
 *.Dockerfile
 docker-compose.yml
+pytest.ini
+tests

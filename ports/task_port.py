@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional, Protocol
 
 from domains.entities import TaskEntity
@@ -14,11 +15,11 @@ class TaskPort(Protocol):
     def create_task(self, task: TaskEntity, session) -> Optional[TaskModel]:
         pass
 
-    def update_task(self, id: str, task: TaskEntity, session) -> Optional[TaskModel]:
+    def update_task(self, id: uuid.UUID, task: TaskEntity, session) -> Optional[TaskModel]:
         pass
 
-    def remove_task(self, id: str, session) -> bool:  # type: ignore
+    def remove_task(self, id: uuid.UUID, session) -> bool:  # type: ignore
         pass
 
-    def get_task(self, id: str, session) -> Optional[TaskModel]:
+    def get_task(self, id: uuid.UUID, session) -> Optional[TaskModel]:
         pass

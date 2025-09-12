@@ -12,7 +12,7 @@ from ports.task_port import TaskPort
 logger = logging.getLogger("TaskLogger")
 
 
-class Task(TaskPort):
+class TaskService(TaskPort):
     def list_tasks(self, session) -> list[TaskModel]:
         tasks = session.exec(select(TaskModel)).all()
         return tasks
@@ -27,8 +27,8 @@ class Task(TaskPort):
         session.refresh(new_task)
         return new_task
 
-    def update_task(self, id: str, task: TaskEntity, session: Session) -> Union[TaskModel, None]:
-        existing_task = session.exec(select(TaskModel).where(TaskModel.id == uuid.UUID(str(id)))).first()
+    def update_task(self, id: uuid.UUID, task: TaskEntity, session: Session) -> Union[TaskModel, None]:
+        existing_task = session.exec(select(TaskModel).where(TaskModel.id == id)).first()
         if not existing_task:
             return None
         was_completed = getattr(existing_task, "completed", False)
@@ -42,16 +42,16 @@ class Task(TaskPort):
             logger.info(f"Task {existing_task.id} marked as completed.")
         return existing_task
 
-    def remove_task(self, id: str, session: Session) -> bool:
-        existing_task = session.exec(select(TaskModel).where(TaskModel.id == uuid.UUID(str(id)))).first()
+    def remove_task(self, id: uuid.UUID, session: Session) -> bool:
+        existing_task = session.exec(select(TaskModel).where(TaskModel.id == id)).first()
         if not existing_task:
             return False
         session.delete(existing_task)
         session.commit()
         return True
 
-    def get_task(self, id: str, session: Session) -> Union[TaskModel, None]:
-        task = session.exec(select(TaskModel).where(TaskModel.id == uuid.UUID(str(id)))).first()
+    def get_task(self, id: uuid.UUID, session: Session) -> Union[TaskModel, None]:
+        task = session.exec(select(TaskModel).where(TaskModel.id == id)).first()
         return task
 
     def check_deadlines(self, session: Session, due: int) -> list[TaskModel]:
@@ -66,3 +66,13 @@ class Task(TaskPort):
             )
         ).all()
         return list(tasks)
+
+    def complete_task(self, id: uuid.UUID, session: Session) -> TaskModel | None:
+        task = self.get_task(id, session)
+        if not task:
+            return None
+        task.completed = True
+        session.add(task)
+        session.commit()
+        session.refresh(task)
+        return task

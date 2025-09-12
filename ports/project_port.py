@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional, Protocol
 
 from domains.entities import ProjectEntity
@@ -8,14 +9,14 @@ class ProjectPort(Protocol):
     def __init__(self) -> None:
         pass
 
-    def get_project(self, id: str, session) -> Optional[ProjectModel]:
+    def get_project(self, id: uuid.UUID, session) -> Optional[ProjectModel]:
         pass
 
-    def update_project(self, id: str, project_entity: ProjectEntity, session) -> Optional[ProjectModel]:
+    def update_project(self, id: uuid.UUID, project_entity: ProjectEntity, session) -> Optional[ProjectModel]:
         pass
 
     def create_project(self, project_entity: ProjectEntity, session) -> Optional[ProjectModel]:
         pass
 
-    def remove_project(self, id: str, session) -> bool:  # type: ignore
+    def remove_project(self, id: uuid.UUID, session) -> bool:  # type: ignore
         pass

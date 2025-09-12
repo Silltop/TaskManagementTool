@@ -4,7 +4,7 @@ from typing import Optional
 from sqlmodel import select
 
 from adapters.api.projects import SessionDep
-from application.project import Project
+from application.project import ProjectService
 from domains.models import ProjectModel, TaskModel
 
 
@@ -25,8 +25,8 @@ class TaskOnProject:
         session.commit()
         return True
 
-    def get_project_tasks(self, project_id: str, session: SessionDep) -> Optional[list[TaskModel]]:
-        project = Project().get_project(project_id, session=session)
+    def get_project_tasks(self, project_id: uuid.UUID, session: SessionDep) -> Optional[list[TaskModel]]:
+        project = ProjectService().get_project(project_id, session=session)
         if not project:
             return None
         tasks = session.exec(select(TaskModel).where(TaskModel.project_id == uuid.UUID(str(project.id)))).all()

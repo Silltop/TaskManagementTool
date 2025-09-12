@@ -9,6 +9,7 @@ Activating venv <br />
 
 Installing dependencies for local env <br />
 `pip install -r requirements.txt`
+`pip install `
 
 ## Running tests
 

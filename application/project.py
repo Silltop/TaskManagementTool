@@ -1,8 +1,9 @@
 import uuid
 from datetime import datetime, timezone
+from email.policy import HTTP
 from typing import Annotated, Optional, Union
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlmodel import Session, select
 
 from adapters.db_connector import get_session
@@ -13,11 +14,11 @@ from ports.project_port import ProjectPort
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
-class Project(ProjectPort):
-    def get_project(self, id: str, session: SessionDep) -> ProjectModel | None:
+class ProjectService(ProjectPort):
+    def get_project(self, id: uuid.UUID, session: SessionDep) -> ProjectModel | None:
         project = session.exec(select(ProjectModel)).all()
         for proj in project:
-            if proj.id == uuid.UUID(str(id)):
+            if proj.id == id:
                 return proj
         return None
 
@@ -31,8 +32,8 @@ class Project(ProjectPort):
         session.refresh(new_project)
         return new_project
 
-    def update_project(self, id: str, project_entity: ProjectEntity, session: Session) -> Optional[ProjectModel]:
-        existing_project = session.exec(select(ProjectModel).where(ProjectModel.id == uuid.UUID(str(id)))).first()
+    def update_project(self, id: uuid.UUID, project_entity: ProjectEntity, session: Session) -> Optional[ProjectModel]:
+        existing_project = session.exec(select(ProjectModel).where(ProjectModel.id == id)).first()
         if not existing_project:
             return None
         for key, value in project_entity.__dict__.items():
@@ -44,8 +45,8 @@ class Project(ProjectPort):
         session.refresh(existing_project)
         return existing_project
 
-    def remove_project(self, id: str, session: Session) -> bool:
-        existing_project = session.exec(select(ProjectModel).where(ProjectModel.id == uuid.UUID(str(id)))).first()
+    def remove_project(self, id: uuid.UUID, session: Session) -> bool:
+        existing_project = session.exec(select(ProjectModel).where(ProjectModel.id == id)).first()
         if not existing_project:
             return False
         session.delete(existing_project)

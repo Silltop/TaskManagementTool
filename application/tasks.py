@@ -1,15 +1,15 @@
-import logging
 import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Union
 
 from sqlmodel import Session, select
 
+from adapters.api.helpers import get_uuid
+from application.project import ProjectService
 from domains.entities import TaskEntity
 from domains.models import TaskModel
+from infrastructure.loggers import app_logger as logger
 from ports.task_port import TaskPort
-
-logger = logging.getLogger("TaskLogger")
 
 
 class TaskService(TaskPort):
@@ -18,6 +18,8 @@ class TaskService(TaskPort):
         return list(tasks)
 
     def create_task(self, task: TaskEntity, session: Session) -> Union[TaskModel, None]:
+        if task.project_id:
+            task.project = ProjectService().get_project(get_uuid(task.project_id), session)
         existing_task = session.exec(select(TaskModel).where(TaskModel.id == task.id)).first()
         if existing_task:
             return None
@@ -75,4 +77,5 @@ class TaskService(TaskPort):
         session.add(task)
         session.commit()
         session.refresh(task)
+        logger.info(f"Task {task.id} marked as completed.")
         return task

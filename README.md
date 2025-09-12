@@ -23,6 +23,10 @@ When you have dependencies simply run:<br />
 
 1. You need to provide api key for geolocation api.
 
-2. Application can be started from docker compose<br />
+1. Application can be started from docker compose<br />
 `docker compose -f docker-compose.yaml up`
 
+
+## Accessing application
+
+1. Open browser and go to `localhost:8000/docs`

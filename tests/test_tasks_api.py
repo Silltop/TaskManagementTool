@@ -1,20 +1,4 @@
-import pytest
-
 BASE_URL = "/tasks"
-
-
-@pytest.fixture
-def sample_task():
-    return {
-        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "title": "string",
-        "description": "string",
-        "deadline": "2025-09-12T19:23:10.513Z",
-        "completed": False,
-        "project_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "created_at": "2025-09-12T19:23:10.513Z",
-        "updated_at": "2025-09-12T19:23:10.513Z",
-    }
 
 
 def test_create_task(client, sample_task):
@@ -85,3 +69,21 @@ def test_delete_task_not_found(client):
     response = client.delete(BASE_URL + "/3fa85f22-5717-4562-b3fc-2c963f66afa6")
     assert response.status_code == 404
     assert response.json()["detail"] == "Task not found"
+
+
+def test_complete_task(client, sample_task):
+    client.post(BASE_URL + "/", json=sample_task)
+    response = client.patch(BASE_URL + f"/{sample_task['id']}/complete")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["completed"] is True
+
+
+# def test_task_exceeding_project_deadline(client, sample_project, task_related_to_project):
+#     # Create a project with a specific deadline
+#     client.post("/projects/", json=sample_project)
+
+#     # Attempt to create a task with a deadline beyond the project's deadline
+#     response = client.post(BASE_URL + "/", json=task_related_to_project)
+#     assert response.status_code == 422  # Unprocessable Entity due to validation error
+#     assert "Task deadline cannot exceed project's deadline" in response.text

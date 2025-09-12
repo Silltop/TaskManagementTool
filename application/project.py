@@ -1,9 +1,8 @@
 import uuid
 from datetime import datetime, timezone
-from email.policy import HTTP
 from typing import Annotated, Optional, Union
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from sqlmodel import Session, select
 
 from adapters.db_connector import get_session
@@ -52,3 +51,20 @@ class ProjectService(ProjectPort):
         session.delete(existing_project)
         session.commit()
         return True
+
+    def get_project_completed_status(self, id: uuid.UUID, session: Session) -> bool:
+        project = session.exec(select(ProjectModel).where(ProjectModel.id == id)).first()
+        if not project:
+            return False
+        return project.completed
+
+    def set_project_completed_status(self, id: uuid.UUID, status: bool, session: Session) -> Optional[ProjectModel]:
+        project = session.exec(select(ProjectModel).where(ProjectModel.id == id)).first()
+        if not project:
+            return None
+        project.completed = status
+        project.updated_at = datetime.now(timezone.utc)
+        session.add(project)
+        session.commit()
+        session.refresh(project)
+        return project

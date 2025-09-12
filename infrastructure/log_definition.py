@@ -21,5 +21,6 @@ logging_config = {
         "uvicorn.error": {"level": "INFO", "propagate": True},
         "uvicorn.access": {"level": "INFO", "propagate": True},
         "uvicorn.asgi": {"level": "INFO", "propagate": True},
+        "application": {"level": "INFO", "propagate": True},
     },
 }

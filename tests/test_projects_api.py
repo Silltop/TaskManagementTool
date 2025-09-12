@@ -1,19 +1,4 @@
-import pytest
-from sqlmodel import Session
-
 BASE_URL = "/projects"
-
-
-@pytest.fixture
-def sample_project():
-    return {
-        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "title": "string",
-        "deadline": "2025-09-12T17:28:37.590Z",
-        "completed": False,
-        "created_at": "2025-09-12T17:28:37.590Z",
-        "updated_at": "2025-09-12T17:28:37.590Z",
-    }
 
 
 def test_create_project(client, sample_project):

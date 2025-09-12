@@ -1,4 +1,3 @@
-from operator import ge
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status

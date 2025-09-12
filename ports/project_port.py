@@ -20,3 +20,9 @@ class ProjectPort(Protocol):
 
     def remove_project(self, id: uuid.UUID, session) -> bool:  # type: ignore
         pass
+
+    def get_project_completed_status(self, id: uuid.UUID, session) -> bool:  # type: ignore
+        pass
+
+    def set_project_completed_status(self, id: uuid.UUID, status: bool, session) -> Optional[ProjectModel]:
+        pass

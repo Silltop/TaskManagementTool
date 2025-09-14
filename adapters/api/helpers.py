@@ -28,3 +28,9 @@ async def invalid_date_provided_exception_handler(request: Request, exc: DateCon
         status_code=400,
         content={"detail": str(exc)},
     )
+
+async def project_not_found_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    return JSONResponse(
+        status_code=404,
+        content={"detail": "Project not found"},
+    )

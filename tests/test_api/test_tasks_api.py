@@ -79,11 +79,11 @@ def test_complete_task(client, sample_task):
     assert data["completed"] is True
 
 
-def test_task_exceeding_project_deadline(client, sample_project, task_related_to_project):
+def test_task_exceeding_project_deadline(client, sample_project, task_related_to_project_broken_date):
     # Create a project with a specific deadline
     client.post("/projects/", json=sample_project)
 
     # Attempt to create a task with a deadline beyond the project's deadline
-    response = client.post(BASE_URL + "/", json=task_related_to_project)
+    response = client.post(BASE_URL + "/", json=task_related_to_project_broken_date)
     assert response.status_code == 400
     assert "Task deadline cannot exceed project's deadline" in response.text

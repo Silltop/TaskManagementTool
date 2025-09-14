@@ -8,3 +8,7 @@ class DateConstraintError(ValueError):
 
 class DateConversionError(ValueError):
     pass
+
+
+class ProjectNotFoundError(Exception):
+    pass

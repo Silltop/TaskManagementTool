@@ -8,6 +8,7 @@ from adapters.db_connector import get_session
 from application.project import ProjectService
 from domains.entities import ProjectEntity
 from domains.models import ProjectModel
+from infrastructure.errors import ProjectNotFoundError
 
 router = APIRouter(prefix="/projects")
 SessionDep = Annotated[Session, Depends(get_session)]
@@ -18,7 +19,7 @@ project_service = ProjectService()
 def get_project_or_404(project_id: str, session: Session) -> ProjectModel:
     project = project_service.get_project(get_uuid(project_id), session)
     if not project:
-        raise HTTPException(status_code=404, detail="Project not found")
+        raise ProjectNotFoundError("Project not found")
     return project
 
 

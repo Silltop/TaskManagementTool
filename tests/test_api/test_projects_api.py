@@ -20,6 +20,7 @@ def test_get_project(client, sample_project):
 
 def test_get_project_not_found(client):
     response = client.get(BASE_URL + "/3fa85f64-5717-4562-b3fc-2c963f66afa4")
+    print(response.json())
     assert response.status_code == 404
     assert response.json()["detail"] == "Project not found"
 

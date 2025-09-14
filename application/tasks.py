@@ -8,6 +8,7 @@ from adapters.api.helpers import get_uuid
 from application.project import ProjectService
 from domains.entities import TaskEntity
 from domains.models import TaskModel
+from infrastructure.errors import ProjectNotFoundError
 from infrastructure.loggers import app_logger as logger
 from ports.task_port import TaskPort
 
@@ -20,6 +21,8 @@ class TaskService(TaskPort):
     def create_task(self, task: TaskEntity, session: Session) -> Union[TaskModel, None]:
         if task.project_id:
             task.project = ProjectService().get_project(get_uuid(task.project_id), session)
+            if not task.project:
+                raise ProjectNotFoundError("Project not found")
             task.check_constraints()
         existing_task = session.exec(select(TaskModel).where(TaskModel.id == task.id)).first()
         if existing_task:
@@ -33,7 +36,8 @@ class TaskService(TaskPort):
     def update_task(self, id: uuid.UUID, task: TaskEntity, session: Session) -> Union[TaskModel, None]:
         if task.project_id:
             task.project = ProjectService().get_project(get_uuid(task.project_id), session)
-            task.check_constraints()
+            if not task.project:
+                raise ProjectNotFoundError("Project not found")
         existing_task = session.exec(select(TaskModel).where(TaskModel.id == id)).first()
         if not existing_task:
             return None

@@ -45,13 +45,12 @@ def sample_task():
         "id": "bfa85f64-1476-4562-b3fc-2c555f66afa6",
         "title": "string",
         "description": "string",
-        "deadline": "2025-09-12T19:23:10.513Z",
+        "deadline": "2025-09-12T17:28:37.590Z",
         "completed": False,
         "project_id": None,
         "created_at": "2025-09-12T19:23:10.513Z",
         "updated_at": "2025-09-12T19:23:10.513Z",
     }
-
 
 @pytest.fixture
 def task_related_to_project():
@@ -59,9 +58,22 @@ def task_related_to_project():
         "id": "3fa85f64-5717-4562-b3fc-2c444f66afa6",
         "title": "string",
         "description": "string",
+        "deadline": "2025-09-12T17:28:37.590Z",
+        "completed": False,
+        "project_id": "afa85f64-5717-4562-b3fc-2c963f66afa6",
+        "created_at": "2025-09-12T19:23:10.513Z",
+        "updated_at": "2025-09-12T19:23:10.513Z",
+    }
+
+@pytest.fixture
+def task_related_to_project_broken_date():
+    return {
+        "id": "3fa85f64-5717-4562-b3fc-2c444f66afa6",
+        "title": "string",
+        "description": "string",
         "deadline": "2025-09-13T19:23:10.513Z",
         "completed": False,
-        "project_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "project_id": "afa85f64-5717-4562-b3fc-2c963f66afa6",
         "created_at": "2025-09-12T19:23:10.513Z",
         "updated_at": "2025-09-12T19:23:10.513Z",
     }

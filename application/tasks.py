@@ -20,6 +20,7 @@ class TaskService(TaskPort):
     def create_task(self, task: TaskEntity, session: Session) -> Union[TaskModel, None]:
         if task.project_id:
             task.project = ProjectService().get_project(get_uuid(task.project_id), session)
+            task.check_constraints()
         existing_task = session.exec(select(TaskModel).where(TaskModel.id == task.id)).first()
         if existing_task:
             return None
@@ -30,6 +31,9 @@ class TaskService(TaskPort):
         return new_task
 
     def update_task(self, id: uuid.UUID, task: TaskEntity, session: Session) -> Union[TaskModel, None]:
+        if task.project_id:
+            task.project = ProjectService().get_project(get_uuid(task.project_id), session)
+            task.check_constraints()
         existing_task = session.exec(select(TaskModel).where(TaskModel.id == id)).first()
         if not existing_task:
             return None

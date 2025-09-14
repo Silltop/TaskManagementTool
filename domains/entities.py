@@ -1,3 +1,4 @@
+from calendar import c
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
@@ -6,7 +7,6 @@ from uuid import UUID
 from domains.models import ProjectModel, TaskModel
 from infrastructure.errors import DateConstraintError
 from infrastructure.utils.converters import convert_to_datetime, convert_to_uuid
-
 
 @dataclass
 class ProjectEntity:
@@ -21,12 +21,9 @@ class ProjectEntity:
     def __post_init__(self):
         if isinstance(self.id, str):
             self.id = convert_to_uuid(self.id)
-        if isinstance(self.created_at, str):
-            self.created_at = datetime.fromisoformat(str(self.created_at).replace("Z", "+00:00"))
-        if isinstance(self.updated_at, str):
-            self.updated_at = datetime.fromisoformat(str(self.updated_at).replace("Z", "+00:00"))
-        if isinstance(self.deadline, str):
-            self.deadline = datetime.fromisoformat(str(self.deadline).replace("Z", "+00:00"))
+        self.created_at = convert_to_datetime(self.created_at)
+        self.updated_at = convert_to_datetime(self.updated_at)
+        self.deadline = convert_to_datetime(self.deadline)
 
         if self.created_at > self.updated_at:
             raise DateConstraintError("created_at cannot be later than updated_at")
@@ -53,15 +50,18 @@ class TaskEntity:
             self.id = convert_to_uuid(self.id)
         if self.project_id and isinstance(self.project_id, str):
             self.project_id = convert_to_uuid(self.project_id)
-        if isinstance(self.created_at, str):
-            self.created_at = convert_to_datetime(self.created_at)
-        if isinstance(self.updated_at, str):
-            self.updated_at = convert_to_datetime(self.updated_at)
-        if isinstance(self.deadline, str):
-            self.deadline = convert_to_datetime(self.deadline)
+        self.created_at = convert_to_datetime(self.created_at)
+        self.updated_at = convert_to_datetime(self.updated_at)
+        self.deadline = convert_to_datetime(self.deadline)
 
         if self.created_at > self.updated_at:
             raise DateConstraintError("created_at cannot be later than updated_at")
-        if self.project:
-            if self.deadline > self.project.deadline:
-                raise DateConstraintError("Task deadline cannot exceed project's deadline")
+            
+    def assign_project(self, project: ProjectModel):
+        self.project = project
+        self.check_constraints()
+
+    def check_constraints(self):
+        project_deadline = convert_to_datetime(self.project.deadline) # type: ignore
+        if self.deadline > project_deadline: # type: ignore
+            raise DateConstraintError("Task deadline cannot exceed project's deadline")

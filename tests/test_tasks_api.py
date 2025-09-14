@@ -85,5 +85,5 @@ def test_task_exceeding_project_deadline(client, sample_project, task_related_to
 
     # Attempt to create a task with a deadline beyond the project's deadline
     response = client.post(BASE_URL + "/", json=task_related_to_project)
-    assert response.status_code == 422  # Unprocessable Entity due to validation error
+    assert response.status_code == 400
     assert "Task deadline cannot exceed project's deadline" in response.text

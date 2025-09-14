@@ -1,12 +1,13 @@
 from operator import ge
+from sqlite3 import Date
 import uvicorn
 from fastapi import FastAPI
 from sqlmodel import create_engine
 
 from adapters.api import projects, tasks
-from adapters.api.helpers import invalid_uuid_exception_handler
+from adapters.api.helpers import invalid_date_provided_exception_handler, invalid_uuid_exception_handler
 from adapters.db_connector import create_db_and_tables
-from infrastructure.errors import ConversionUUIDError
+from infrastructure.errors import ConversionUUIDError, DateConstraintError
 from infrastructure.log_definition import logging_config
 from infrastructure.scheduler import lifespan
 from os import getenv
@@ -16,6 +17,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(projects.router)
 app.include_router(tasks.router)
 app.add_exception_handler(ConversionUUIDError, invalid_uuid_exception_handler)  # type: ignore
+app.add_exception_handler(DateConstraintError, invalid_date_provided_exception_handler) # type: ignore
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"

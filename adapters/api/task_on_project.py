@@ -1,14 +1,15 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session
 
-from adapters.api.projects import get_project_or_404, router
+from adapters.api.projects import get_project_or_404
 from adapters.api.tasks import get_task_or_404
 from adapters.db_connector import get_session
 from application.task_on_project import TaskOnProject
 from domains.models import TaskModel
 
+router = APIRouter(prefix="/projects")
 task_on_project = TaskOnProject()
 SessionDep = Annotated[Session, Depends(get_session)]
 

@@ -1,12 +1,15 @@
 import uuid
-from typing import Optional
+from typing import Annotated, Optional
 
+from fastapi import Depends
+from pytest import Session
 from sqlmodel import select
 
-from adapters.api.projects import SessionDep
+from adapters.db_connector import get_session
 from application.project import ProjectService
 from domains.models import ProjectModel, TaskModel
 
+SessionDep = Annotated[Session, Depends(get_session)]
 
 class TaskOnProject:
     def link_task_to_project(self, project: ProjectModel, task: TaskModel, session: SessionDep) -> bool:

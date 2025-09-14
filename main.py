@@ -4,7 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from sqlmodel import create_engine
 
-from adapters.api import projects, tasks
+from adapters.api import projects, tasks, task_on_project
 from adapters.api.helpers import invalid_date_provided_exception_handler, invalid_uuid_exception_handler
 from adapters.db_connector import create_db_and_tables
 from infrastructure.errors import ConversionUUIDError, DateConstraintError
@@ -16,6 +16,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(projects.router)
 app.include_router(tasks.router)
+app.include_router(task_on_project.router)
 app.add_exception_handler(ConversionUUIDError, invalid_uuid_exception_handler)  # type: ignore
 app.add_exception_handler(DateConstraintError, invalid_date_provided_exception_handler) # type: ignore
 

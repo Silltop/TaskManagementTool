@@ -4,14 +4,14 @@ from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 
 from infrastructure.errors import ConversionUUIDError, DateConstraintError
-from infrastructure.utils.converters import convert_str_to_uuid
+from infrastructure.utils.converters import convert_to_uuid
 
 
 def get_uuid(id: uuid.UUID | str) -> uuid.UUID:
     try:
         if isinstance(id, uuid.UUID):
             return id
-        return convert_str_to_uuid(id)
+        return convert_to_uuid(id)
     except ConversionUUIDError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
 
